@@ -8,11 +8,26 @@ group1Delim:\\n
 \t\tvar3:\\w
 \t\tvar4:\\d`;
 
-const parseBuilder = (str, state, setState) => {
+const buildToRegex = (build) => {
+  const re = buildToRegexRecursion(build, "");
+  return re;
+};
+
+const buildToRegexRecursion = (build, re) => {
+  if (build.length === 0) return re;
+  const val = build.shift();
+  re += `(?P<${val.name}>${val.regex}`;
+  if (val.children) re += buildToRegexRecursion(val.children, "");
+  re += `${val.optional})`;
+
+  return buildToRegexRecursion(build, re, val);
+};
+
+const parseBuilder = (str) => {
   const r = parseBuilderRegex(0);
   const m = r.exec(str);
   const vars = parseBuilderRecursion([], m, 0);
-  console.log(vars);
+  return buildToRegex(vars);
 };
 
 const parseBuilderRecursion = (vars, pm, lvl) => {
@@ -20,7 +35,6 @@ const parseBuilderRecursion = (vars, pm, lvl) => {
   vars.push(pm.groups);
   pm.input = pm.input.split(pm[0])[1];
   if (!pm.input.trim()) {
-    console.log("done traversing");
     return vars;
   }
 
@@ -98,7 +112,9 @@ function App() {
           onChangeCapture={(e) => {
             state.build = [];
             setState({ ...state });
-            parseBuilder(e.target.value, state, setState);
+            const parseBuild = parseBuilder(e.target.value);
+            regexInputSpan.focus();
+            regexInputSpan.dispatchEvent(new Event("keydown", { key: "a" }));
           }}
         ></textarea>
       </div>
