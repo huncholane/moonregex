@@ -14,7 +14,7 @@ const buildToRegex = (build) => {
 };
 
 const buildToRegexRecursion = (build, re) => {
-  if (build.length === 0) return re;
+  if (!build?.length) return re;
   const val = build.shift();
   re += `(?P<${val.name}>${val.regex}`;
   if (val.children) re += buildToRegexRecursion(val.children, "");
@@ -79,9 +79,12 @@ function App() {
     valid: true,
     build: [],
   });
-  const regexInputSpan = Array.from(document.querySelectorAll("span")).filter(
-    (span) => span.getAttribute("role") === "presentation"
-  )[0];
+  const regexInput = document.querySelector(
+    "#regex-app > div > div.QtZzw > div > div.AUc0W > div.rjodX > div.cO83v > div.h9z_E.T886D > div > div > div:nth-child(1) > textarea"
+  );
+  const regexValue = document.querySelector(
+    "#regex-app > div > div.QtZzw > div > div.AUc0W > div.rjodX > div.cO83v > div.h9z_E.T886D > div > div > div.CodeMirror-scroll > div.CodeMirror-sizer > div > div > div > div.CodeMirror-code"
+  );
 
   return (
     <div>
@@ -113,8 +116,20 @@ function App() {
             state.build = [];
             setState({ ...state });
             const parseBuild = parseBuilder(e.target.value);
-            regexInputSpan.focus();
-            regexInputSpan.dispatchEvent(new Event("keydown", { key: "a" }));
+            if (!parseBuild) setState({ valid: false });
+            else setState({ valid: true });
+            //regexInput.focus();
+            const length = regexValue.textContent.length;
+            for (let i = 0; i < length; i++)
+              regexInput.dispatchEvent(
+                new KeyboardEvent("keydown", {
+                  key: "Backspace",
+                  code: "Backspace",
+                  keyCode: 8,
+                })
+              );
+            regexInput.value = parseBuild;
+            setTimeout(() => e.target.focus(), 100);
           }}
         ></textarea>
       </div>
