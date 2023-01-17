@@ -1,11 +1,13 @@
-export const parseBuilder = (str) => {
+const parseBuilder = (str) => {
   let lines = str.split("\n");
   const ref = {};
   for (let line of lines) {
-    const lineData =
-      /^(?<tabs>\s*)(?<name>\w*)(?<optional>\??):(?<regex>.*)/.exec(
-        line
-      ).groups;
+    if (!line.trim()) continue;
+    const r = /^(?<tabs>\s*)(?<name>\w*)(?<optional>\??):(?<regex>.*)/.exec(
+      line
+    );
+    if (!r) return "";
+    const lineData = r.groups;
     const tabs = lineData.tabs.length;
     if (!ref[tabs]) ref[tabs] = [lineData];
     else ref[tabs].push(lineData);
@@ -16,10 +18,10 @@ export const parseBuilder = (str) => {
       else parent.children.push(lineData);
     }
   }
-  return ref[0];
+  return buildToRegex(ref[0]);
 };
 
-export const buildToRegex = (build) => {
+const buildToRegex = (build) => {
   const re = buildToRegexRecursion(build, "");
   return re;
 };
@@ -34,3 +36,5 @@ const buildToRegexRecursion = (build, re) => {
 
   return buildToRegexRecursion(build, re);
 };
+
+export default parseBuilder;

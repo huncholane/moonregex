@@ -1,4 +1,5 @@
 import { useState } from "react";
+import parseBuilder from "./builder";
 
 const placeholder = `Enter your variables here like below.
 group1Delim:\\n
@@ -7,74 +8,6 @@ group1Delim:\\n
 \tgroup2Delim:\\s
 \t\tvar3:\\w
 \t\tvar4:\\d`;
-
-const buildToRegex = (build) => {
-  const re = buildToRegexRecursion(build, "");
-  console.log(re);
-  return re;
-};
-
-const buildToRegexRecursion = (build, re) => {
-  if (!build?.length) return re;
-  const val = build.shift();
-  if (val.name) re += `(?P<${val.name}>${val.regex}`;
-  else re += `(?:${val.regex}`;
-  if (val.children) re += buildToRegexRecursion(val.children, "");
-  re += `${val.optional})`;
-
-  return buildToRegexRecursion(build, re, val);
-};
-
-const parseBuilder = (str) => {
-  const r = parseBuilderRegex(0);
-  const m = r.exec(str);
-  const vars = parseBuilderRecursion([], m, 0);
-  return buildToRegex(vars);
-};
-
-const parseBuilderRecursion = (vars, pm, lvl) => {
-  if (!pm) return;
-  vars.push(pm.groups);
-  pm.input = pm.input.split(pm[0])[1];
-  if (!pm.input.trim()) {
-    return vars;
-  }
-
-  // get next on this lvl
-  const r = parseBuilderRegex(lvl);
-  const m = r.exec(pm.input);
-
-  // get between if there is a next on this lvl
-  if (m) {
-    const children = pm.input.split(m[0])[0];
-    const childR = parseBuilderRegex(lvl + 1);
-    const childM = childR.exec(children);
-    if (childM) {
-      pm.groups.children = [];
-      parseBuilderRecursion(pm.groups.children, childM, lvl + 1);
-    }
-    return parseBuilderRecursion(vars, m, lvl);
-  }
-  // gap between if there is not a next on this lvl
-  else {
-    const childR = parseBuilderRegex(lvl + 1);
-    const childM = childR.exec(pm.input);
-    if (childM) {
-      pm.groups.children = [];
-      parseBuilderRecursion(pm.groups.children, childM, lvl + 1);
-    }
-    return vars;
-  }
-
-  // return this level with recursion
-};
-
-const parseBuilderRegex = (numTabs) => {
-  return new RegExp(
-    `^(\\t{${numTabs}})(?<name>\\w*)(?<optional>\\??):(?<regex>.*)$`,
-    "gm"
-  );
-};
 
 function App() {
   const [state, setState] = useState({
@@ -118,6 +51,7 @@ function App() {
             state.build = [];
             setState({ ...state });
             const parseBuild = parseBuilder(e.target.value);
+            console.log(parseBuild);
             if (!parseBuild) setState({ valid: false });
             else setState({ valid: true });
             //regexInput.focus();
