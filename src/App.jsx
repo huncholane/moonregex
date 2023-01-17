@@ -10,13 +10,15 @@ group1Delim:\\n
 
 const buildToRegex = (build) => {
   const re = buildToRegexRecursion(build, "");
+  console.log(re);
   return re;
 };
 
 const buildToRegexRecursion = (build, re) => {
   if (!build?.length) return re;
   const val = build.shift();
-  re += `(?P<${val.name}>${val.regex}`;
+  if (val.name) re += `(?P<${val.name}>${val.regex}`;
+  else re += `(?:${val.regex}`;
   if (val.children) re += buildToRegexRecursion(val.children, "");
   re += `${val.optional})`;
 
