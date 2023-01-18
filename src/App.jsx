@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import parseBuilder from "./builder";
+import { AiFillSave } from "react-icons/ai";
 
 const placeholder = `Enter your variables here like below.
 group1Delim:\\n
@@ -14,6 +15,7 @@ function App() {
   const [build, setBuild] = useState("");
   const [edited, setEdited] = useState(0);
   const [target, setTarget] = useState(null);
+  const [save, setSave] = useState(true);
   const regexInput = document.querySelector(
     "#regex-app > div > div.QtZzw > div > div.AUc0W > div.rjodX > div.cO83v > div.h9z_E.T886D > div > div > div:nth-child(1) > textarea"
   );
@@ -64,7 +66,31 @@ function App() {
   );
 
   const updateRegex = () => {
-    if (edited !== 1) return;
+    if (edited !== 0 || !save) return;
+    saveBuild();
+  };
+
+  useEffect(updateRegex, [edited]);
+
+  useEffect(() => {
+    if (save) saveBuild();
+  }, [save]);
+
+  return (
+    <div>
+      <div className="w-full">
+        <div className="w-full text-lg text-center relative">
+          <div>Build Variables</div>
+          <div className="absolute right-2 top-8">
+            {saveButton(setSave, save)}
+          </div>
+        </div>
+        {builder}
+      </div>
+    </div>
+  );
+
+  function saveBuild() {
     const length = regexValue.textContent.length;
     for (let i = 0; i < length; i++)
       regexInput.dispatchEvent(
@@ -76,18 +102,24 @@ function App() {
       );
     regexInput.value = build;
     setTimeout(() => target?.focus(), 100);
-  };
-
-  useEffect(updateRegex, [edited]);
-
-  return (
-    <div>
-      <div className="w-full">
-        <div className="w-full text-lg text-center">Build Variables</div>
-        {builder}
-      </div>
-    </div>
-  );
+  }
 }
 
 export default App;
+function saveButton(setSave, save) {
+  const active = "bg-blue-500 h-10 p-1 rounded-sm hover:bg-blue-100";
+  const inactive = "bg-blue-100 h-10 p-1 rounded-sm hover:bg-blue-500";
+  const activeSave = <AiFillSave size="100%" color="white" />;
+  const inactiveSave = <AiFillSave size="100%" color="white" />;
+  return (
+    <button
+      className={save ? active : inactive}
+      onClick={(e) => {
+        e.preventDefault();
+        setSave(!save);
+      }}
+    >
+      {save ? activeSave : inactiveSave}
+    </button>
+  );
+}
