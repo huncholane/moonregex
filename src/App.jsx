@@ -83,7 +83,7 @@ function App() {
       <div className="w-full">
         <div className="w-full text-lg text-center relative">
           <div>Build Variables</div>
-          <div className="absolute right-2 top-8">
+          <div className="absolute right-8 top-8">
             {saveButton(setSave, save)}
           </div>
         </div>
