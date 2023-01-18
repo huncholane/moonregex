@@ -32,7 +32,7 @@ const buildToRegexRecursion = (build, re) => {
   if (val.name) re += `(?P<${val.name}>${val.regex}`;
   else re += `(?:${val.regex}`;
   if (val.children) re += buildToRegexRecursion(val.children, "");
-  re += `${val.optional})`;
+  re += `)${val.optional}`;
 
   return buildToRegexRecursion(build, re);
 };

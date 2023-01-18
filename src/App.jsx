@@ -24,9 +24,9 @@ function App() {
   );
   const builder = (
     <textarea
-      rows="10"
+      rows="20"
       className={
-        "w-full p-2 rounded-sm font-re101-input text-input" +
+        "w-full p-2 rounded-sm font-re101-input text-input decoration-slate-500 underline" +
         (valid ? "" : " text-red-500")
       }
       placeholder={placeholder}
@@ -46,7 +46,7 @@ function App() {
             break;
         }
         if (e.ctrlKey && e.key == "s") {
-          console.log("save");
+          saveBuild();
         }
       }}
       onChangeCapture={(e) => {
@@ -58,7 +58,6 @@ function App() {
         setTimeout(
           () =>
             setEdited((old) => {
-              console.log(old);
               return old - 1;
             }),
           1000
