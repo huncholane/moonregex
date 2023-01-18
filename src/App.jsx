@@ -12,7 +12,7 @@ group1Delim:\\n
 function App() {
   const [valid, setValid] = useState(false);
   const [build, setBuild] = useState("");
-  const [edited, setEdited] = useState(false);
+  const [edited, setEdited] = useState(0);
   const [target, setTarget] = useState(null);
   const regexInput = document.querySelector(
     "#regex-app > div > div.QtZzw > div > div.AUc0W > div.rjodX > div.cO83v > div.h9z_E.T886D > div > div > div:nth-child(1) > textarea"
@@ -50,11 +50,21 @@ function App() {
         else setValid(true);
         setBuild(parseBuild);
         setTarget(e.target);
+        setTimeout(
+          () =>
+            setEdited((old) => {
+              console.log(old);
+              return old - 1;
+            }),
+          1000
+        );
+        setEdited(edited + 1);
       }}
     ></textarea>
   );
 
   const updateRegex = () => {
+    if (edited !== 1) return;
     const length = regexValue.textContent.length;
     for (let i = 0; i < length; i++)
       regexInput.dispatchEvent(
@@ -68,7 +78,7 @@ function App() {
     setTimeout(() => target?.focus(), 100);
   };
 
-  useEffect(updateRegex, [build]);
+  useEffect(updateRegex, [edited]);
 
   return (
     <div>
