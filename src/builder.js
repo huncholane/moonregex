@@ -3,11 +3,13 @@ const parseBuilder = (str) => {
   const ref = {};
   for (let line of lines) {
     if (!line.trim()) continue;
-    const r = /^(?<tabs>\s*)(?<name>\w*)(?<optional>\??):(?<regex>.*)/.exec(
-      line
-    );
+    const r =
+      /^(?<tabs>\s*)(?<name>\w*)(?<optional>\??)(?<type>[:>])(?<regex>.*)/.exec(
+        line
+      );
     if (!r) return "";
     const lineData = r.groups;
+    console.log(lineData);
     const tabs = lineData.tabs.length;
     if (!ref[tabs]) ref[tabs] = [lineData];
     else ref[tabs].push(lineData);
@@ -29,10 +31,15 @@ const buildToRegex = (build) => {
 const buildToRegexRecursion = (build, re) => {
   if (!build?.length) return re;
   const val = build.shift();
-  if (val.name) re += `(?P<${val.name}>${val.regex}`;
-  else re += `(?:${val.regex}`;
-  if (val.children) re += buildToRegexRecursion(val.children, "");
-  re += `)${val.optional}`;
+  if (val.type === ":") {
+    if (val.name) re += `(?P<${val.name}>${val.regex}`;
+    else re += `(?:${val.regex}`;
+    if (val.children) re += buildToRegexRecursion(val.children, "");
+    re += `)${val.optional}`;
+  } else if (val.type === ">") {
+    re += val.regex;
+    if (val.children) re += buildToRegexRecursion(val.children, "");
+  }
 
   return buildToRegexRecursion(build, re);
 };
