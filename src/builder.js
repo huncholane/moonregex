@@ -4,7 +4,7 @@ const parseBuilder = (str) => {
   for (let line of lines) {
     if (!line.trim()) continue;
     const r =
-      /^(?<tabs>\s*)(?<name>\w*)(?<optional>\??)(?<type>[:>])(?<regex>.*)/.exec(
+      /^(?<tabs>\s*)(?<name>\w*)(?<optional>[\*\+\?]*)(?<type>[:>])(?<regex>.*)/.exec(
         line
       );
     if (!r) return "";
