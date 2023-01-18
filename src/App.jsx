@@ -45,6 +45,9 @@ function App() {
             e.target.selectionStart = e.target.selectionEnd = index + 1;
             break;
         }
+        if (e.ctrlKey && e.key == "s") {
+          console.log("save");
+        }
       }}
       onChangeCapture={(e) => {
         const parseBuild = parseBuilder(e.target.value);
