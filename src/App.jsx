@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import parseBuilder from "./builder";
+import parseBuilder, { readVars } from "./builder";
 import { AiFillSave } from "react-icons/ai";
 
 const placeholder = `Enter your variables here like below.
@@ -16,55 +16,89 @@ function App() {
   const [edited, setEdited] = useState(0);
   const [target, setTarget] = useState(null);
   const [save, setSave] = useState(true);
+  const [hideVariables, setHideVariables] = useState(false);
+  const [hideBuilder, setHideBuilder] = useState(false);
+  const [varText, setVarText] = useState("");
   const regexInput = document.querySelector(
     "#regex-app > div > div.QtZzw > div > div.AUc0W > div.rjodX > div.cO83v > div.h9z_E.T886D > div > div > div:nth-child(1) > textarea"
   );
   const regexValue = document.querySelector(
     "#regex-app > div > div.QtZzw > div > div.AUc0W > div.rjodX > div.cO83v > div.h9z_E.T886D > div > div > div.CodeMirror-scroll > div.CodeMirror-sizer > div > div > div > div.CodeMirror-code"
   );
-  const builder = (
-    <textarea
-      rows="20"
-      className={
-        "w-full p-2 rounded-sm font-re101-input text-input decoration-slate-500 underline" +
-        (valid ? "" : " text-red-500")
-      }
-      placeholder={placeholder}
-      spellCheck="off"
-      onKeyDown={(e) => {
-        switch (e.key) {
-          case "Enter":
-            break;
-          case "Tab":
+  const hideButton = (setHide, hide) => {
+    return (
+      <div className="absolute flex bottom-3 w-full">
+        <button
+          className="h-10 w-24 rounded-md mx-auto bg-blue-500 text-white"
+          onClick={(e) => {
             e.preventDefault();
-            const index = e.target.selectionStart;
-            e.target.value =
-              e.target.value.substring(0, index) +
-              "\t" +
-              e.target.value.substring(index);
-            e.target.selectionStart = e.target.selectionEnd = index + 1;
-            break;
+            setHide(!hide);
+          }}
+        >
+          {hide ? "Show" : "Hide"}
+        </button>
+      </div>
+    );
+  };
+  const variables = (
+    <div className="relative">
+      <textarea
+        rows={hideVariables ? 2 : 10}
+        className="w-full"
+        onChange={(e) => {
+          setVarText(e.target.value);
+        }}
+      ></textarea>
+      {hideButton(setHideVariables, hideVariables)}
+    </div>
+  );
+  const builder = (
+    <div className="relative">
+      <textarea
+        rows={hideBuilder ? 2 : 30}
+        className={
+          "w-full p-2 rounded-sm font-re101-input text-input decoration-slate-500 underline" +
+          (valid ? "" : " text-red-500")
         }
-        if (e.ctrlKey && e.key == "s") {
-          saveBuild();
-        }
-      }}
-      onChangeCapture={(e) => {
-        const parseBuild = parseBuilder(e.target.value);
-        if (!parseBuild) setValid(false);
-        else setValid(true);
-        setBuild(parseBuild);
-        setTarget(e.target);
-        setTimeout(
-          () =>
-            setEdited((old) => {
-              return old - 1;
-            }),
-          1000
-        );
-        setEdited(edited + 1);
-      }}
-    ></textarea>
+        placeholder={placeholder}
+        spellCheck="off"
+        onKeyDown={(e) => {
+          switch (e.key) {
+            case "Enter":
+              break;
+            case "Tab":
+              e.preventDefault();
+              const index = e.target.selectionStart;
+              e.target.value =
+                e.target.value.substring(0, index) +
+                "\t" +
+                e.target.value.substring(index);
+              e.target.selectionStart = e.target.selectionEnd = index + 1;
+              break;
+          }
+          if (e.ctrlKey && e.key == "s") {
+            saveBuild();
+          }
+        }}
+        onChangeCapture={(e) => {
+          const parsedVars = readVars(varText);
+          const parseBuild = parseBuilder(e.target.value, parsedVars);
+          if (!parseBuild) setValid(false);
+          else setValid(true);
+          setBuild(parseBuild);
+          setTarget(e.target);
+          setTimeout(
+            () =>
+              setEdited((old) => {
+                return old - 1;
+              }),
+            1000
+          );
+          setEdited(edited + 1);
+        }}
+      ></textarea>
+      {hideButton(setHideBuilder, hideBuilder)}
+    </div>
   );
 
   const updateRegex = () => {
@@ -83,11 +117,13 @@ function App() {
       <div className="w-full">
         <div className="w-full text-lg text-center relative">
           <div>Build Variables</div>
+          {variables}
+          <div>Build Regex</div>
+          {builder}
           <div className="absolute right-8 top-8">
             {saveButton(setSave, save)}
           </div>
         </div>
-        {builder}
       </div>
     </div>
   );

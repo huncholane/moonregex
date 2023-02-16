@@ -1,4 +1,18 @@
-const parseBuilder = (str) => {
+export const readVars = (str) => {
+  let lines = str.split("\n");
+  const vars = {};
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+    let lineSplit = line.split(":==");
+    if ((lineSplit.length = 2)) {
+      let [name, val] = lineSplit;
+      vars[name] = val;
+    }
+  }
+  return vars;
+};
+
+const parseBuilder = (str, vars) => {
   let lines = str.split("\n");
   const ref = {};
   for (let line of lines) {
@@ -20,17 +34,19 @@ const parseBuilder = (str) => {
       else parent.children.push(lineData);
     }
   }
-  return buildToRegex(ref[0]);
+  return buildToRegex(ref[0], vars);
 };
 
-const buildToRegex = (build) => {
-  const re = buildToRegexRecursion(build, "");
+const buildToRegex = (build, vars) => {
+  const re = buildToRegexRecursion(build, "", vars);
   return re;
 };
 
-const buildToRegexRecursion = (build, re) => {
+const buildToRegexRecursion = (build, re, vars) => {
   if (!build?.length) return re;
   const val = build.shift();
+  console.log(vars);
+  if (Object.keys(vars).includes(val.regex)) val.regex = vars[val.regex];
   if (val.type === ":") {
     if (val.name) re += `(?P<${val.name}>${val.regex}`;
     else re += `(?:${val.regex}`;
