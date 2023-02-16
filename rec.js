@@ -46,4 +46,3 @@ const buildToRegexRecursion = (build, re) => {
 const d = parseBuilder(sample);
 
 const b = buildToRegex(d);
-console.log(b);

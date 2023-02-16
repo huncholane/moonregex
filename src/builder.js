@@ -44,18 +44,20 @@ const buildToRegex = (build, vars) => {
 const buildToRegexRecursion = (build, re, vars) => {
   if (!build?.length) return re;
   const val = build.shift();
-  if (Object.keys(vars).includes(val.regex)) val.regex = vars[val.regex];
+  console.log(vars);
+  if (vars && Object.keys(vars).includes(val.regex))
+    val.regex = vars[val.regex];
   if (val.type === ":") {
     if (val.name) re += `(?P<${val.name}>${val.regex}`;
     else re += `(?:${val.regex}`;
-    if (val.children) re += buildToRegexRecursion(val.children, "");
+    if (val.children) re += buildToRegexRecursion(val.children, "", vars);
     re += `)${val.optional}`;
   } else if (val.type === ">") {
     re += val.regex;
-    if (val.children) re += buildToRegexRecursion(val.children, "");
+    if (val.children) re += buildToRegexRecursion(val.children, "", vars);
   }
 
-  return buildToRegexRecursion(build, re);
+  return buildToRegexRecursion(build, re, vars);
 };
 
 export default parseBuilder;
