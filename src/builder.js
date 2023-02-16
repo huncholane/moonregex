@@ -23,7 +23,6 @@ const parseBuilder = (str, vars) => {
       );
     if (!r) return "";
     const lineData = r.groups;
-    console.log(lineData);
     const tabs = lineData.tabs.length;
     if (!ref[tabs]) ref[tabs] = [lineData];
     else ref[tabs].push(lineData);
@@ -45,7 +44,6 @@ const buildToRegex = (build, vars) => {
 const buildToRegexRecursion = (build, re, vars) => {
   if (!build?.length) return re;
   const val = build.shift();
-  console.log(vars);
   if (Object.keys(vars).includes(val.regex)) val.regex = vars[val.regex];
   if (val.type === ":") {
     if (val.name) re += `(?P<${val.name}>${val.regex}`;
