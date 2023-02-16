@@ -19,6 +19,7 @@ function App() {
   const [hideVariables, setHideVariables] = useState(false);
   const [hideBuilder, setHideBuilder] = useState(false);
   const [varText, setVarText] = useState("");
+  const [builderText, setBuilderText] = useState("");
   const regexInput = document.querySelector(
     "#regex-app > div > div.QtZzw > div > div.AUc0W > div.rjodX > div.cO83v > div.h9z_E.T886D > div > div > div:nth-child(1) > textarea"
   );
@@ -47,6 +48,16 @@ function App() {
         className="w-full"
         onChange={(e) => {
           setVarText(e.target.value);
+          const parsedVars = readVars(e.target.value);
+          const parseBuild = parseBuilder(builderText, parsedVars);
+          if (!parseBuild) setValid(false);
+          else setValid(true);
+          setBuild(parseBuild);
+        }}
+        onKeyDown={(e) => {
+          if (e.ctrlKey && e.key == "s") {
+            saveBuild();
+          }
         }}
       ></textarea>
       {hideButton(setHideVariables, hideVariables)}
@@ -82,6 +93,7 @@ function App() {
         }}
         onChangeCapture={(e) => {
           const parsedVars = readVars(varText);
+          setBuilderText(e.target.value);
           const parseBuild = parseBuilder(e.target.value, parsedVars);
           if (!parseBuild) setValid(false);
           else setValid(true);
