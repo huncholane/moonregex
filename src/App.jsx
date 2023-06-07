@@ -20,6 +20,7 @@ function App() {
   const [hideBuilder, setHideBuilder] = useState(false);
   const [varText, setVarText] = useState("");
   const [builderText, setBuilderText] = useState("");
+  console.log("app is running");
   const regexInput = document.querySelector(
     "#regex-app > div > div.QtZzw > div > div.AUc0W > div.rjodX > div.cO83v > div.h9z_E.T886D > div > div > div:nth-child(1) > textarea"
   );
