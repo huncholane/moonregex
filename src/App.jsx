@@ -141,6 +141,7 @@ function App() {
   );
 
   function saveBuild() {
+    if (!regexValue) return;
     const length = regexValue.textContent.length;
     for (let i = 0; i < length; i++)
       regexInput.dispatchEvent(
